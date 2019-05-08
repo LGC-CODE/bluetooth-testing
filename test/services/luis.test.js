@@ -1,9 +1,9 @@
 const assert = require('assert');
 const app = require('../.././/app');
 
-describe('\'bluetooth-node\' service', () => {
+describe('\'luis\' service', () => {
   it('registered the service', () => {
-    const service = app.service('bluetooth-node');
+    const service = app.service('luis');
 
     assert.ok(service, 'Registered the service');
   });

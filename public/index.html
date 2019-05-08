@@ -83,11 +83,27 @@
       });
     }
 
+    function ab2str(buf) {
+      return String.fromCharCode.apply(null, new Uint8Array(buf));
+    }
+
+    function str2ab(str) {
+      var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
+      var bufView = new Uint16Array(buf);
+      for (var i = 0, strLen = str.length; i < strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+      }
+      return buf;
+    }
+
+    function arrayToString(bufferValue) {
+      return new TextDecoder("utf-8").decode(bufferValue);
+    }
+
     window.addEventListener('mouseup', function (event) {
       navigator.bluetooth.requestDevice({
-          filters: [{
-            services: ['7772E5DB-3868-4112-A1A9-F2669D106BF3']
-          }]
+          acceptAllDevices: true,
+          optionalServices: ['device_information']
         })
         .then(device => {
           return device.gatt.connect();
@@ -95,11 +111,11 @@
         .then(server => {
           console.log(server);
           //gatt server
-          return server.getPrimaryService('user_data');
+          return server.getPrimaryService('device_information');
         })
         .then(battService => {
           console.log(battService);
-          // return battService.getCharacteristic('battery_level');
+          return battService.getCharacteristic('manufacturer_name_string');
         })
         .then(battLevel => {
           console.log(battLevel);
@@ -107,7 +123,8 @@
         })
         .then(battValue => {
           console.log(battValue);
-          console.log('Battery percentage is ' + value.getUint8(0));
+          var enc = new TextDecoder("utf-8");
+          console.log('manufacturer ' + enc.decode(battValue));
         })
         .catch(error => {
           throw new Error(error.message);
